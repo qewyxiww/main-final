@@ -1,19 +1,13 @@
-FROM golang:1.23-alpine AS build-stage
+FROM golang:1.25.1
 
 WORKDIR /app
 
 COPY . .
 
-RUN go mod init github.com/qewyxiww/main-final 2>/dev/null || true
-RUN go mod tidy
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o tracker-app
+RUN go get github.com/stretchr/testify
+RUN go get modernc.org/sqlite
 
-FROM alpine:latest
-
-WORKDIR /root/
-
-COPY --from=build-stage /app/tracker-app .
-COPY --from=build-stage /app/tracker.db .
+RUN go build -o tracker-app
 
 RUN chmod +x tracker-app
 
